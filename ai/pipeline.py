@@ -28,7 +28,11 @@ def verify_article(
         FAKE / REAL / UNCERTAIN
     """
 
-    article_id = int(article_id)
+    if article_id is not None:
+        try:
+            article_id = int(article_id)
+        except (ValueError, TypeError):
+            article_id = None
 
     title = str(title or "")
     content = str(content or "")

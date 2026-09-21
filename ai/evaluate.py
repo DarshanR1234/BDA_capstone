@@ -26,7 +26,7 @@ if str(PROJECT_ROOT) not in sys.path:
 if str(AI_DIR) not in sys.path:
     sys.path.insert(0, str(AI_DIR))
 
-from pipeline import verify_article
+from ai.pipeline import verify_article
 
 
 # ============================================================

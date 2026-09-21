@@ -57,6 +57,14 @@ TRUE_TERMS = [
     "पुष्टि",
 ]
 
+STOPWORDS = {
+    "the", "and", "for", "that", "this", "with", "from", "into", "after", "before", "during",
+    "said", "says", "was", "were", "has", "have", "had", "will", "would", "could", "should",
+    "about", "their", "there", "they", "them", "india", "indian", "according", "report", "reports",
+    "claim", "claims", "news", "और", "यह", "इस", "उस", "एक", "के", "की", "का", "में", "से",
+    "पर", "को", "भी", "है", "हैं", "था", "थी", "थे", "हुए", "हुआ", "हुई", "ने", "हो", "गया", "गई"
+}
+
 
 # ============================================================
 # TEXT NORMALIZATION
@@ -172,6 +180,12 @@ def calculate_claim_overlap(
     if not query_tokens:
         return 0.0
 
+    distinctive_tokens = {
+        t for t in query_tokens
+        if t not in STOPWORDS and len(t) > 1
+    }
+    eval_tokens = distinctive_tokens if distinctive_tokens else query_tokens
+
     title_tokens = token_set(
         title
     )
@@ -185,18 +199,18 @@ def calculate_claim_overlap(
 
     title_overlap = (
         len(
-            query_tokens
+            eval_tokens
             & title_tokens
         )
-        / len(query_tokens)
+        / len(eval_tokens)
     )
 
     content_overlap = (
         len(
-            query_tokens
+            eval_tokens
             & content_tokens
         )
-        / len(query_tokens)
+        / len(eval_tokens)
     )
 
     score = (
@@ -436,23 +450,21 @@ def calculate_final_score(
 
     score = (
 
-        0.22 * semantic_score
+        0.15 * semantic_score
 
-        + 0.14 * lexical_score
+        + 0.10 * lexical_score
 
-        + 0.18 * claim_lexical_score
+        + 0.22 * claim_lexical_score
 
-        + 0.12 * phrase_score
+        + 0.15 * phrase_score
 
-        + 0.12 * entity_score
+        + 0.15 * entity_score
 
-        + 0.08 * number_date_score
+        + 0.09 * number_date_score
 
-        + 0.07 * fact_check_score
+        + 0.10 * fact_check_score
 
         + 0.04 * directness_score
-
-        + 0.03 * retriever_relevance
     )
 
     return clamp(
@@ -831,6 +843,11 @@ def rerank(
             ),
 
             "claim_match": round(
+                claim_match,
+                4
+            ),
+
+            "claim_match_score": round(
                 claim_match,
                 4
             ),

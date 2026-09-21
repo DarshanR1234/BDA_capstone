@@ -1474,25 +1474,25 @@ def retrieve(
 
         relevance = (
 
-            0.20
+            0.14
             *
             semantic_score_norm
 
             +
 
-            0.12
+            0.08
             *
             lexical_score_norm
 
             +
 
-            0.10
+            0.15
             *
             claim_score_norm
 
             +
 
-            0.13
+            0.15
             *
             min(entity_score, 1.0)
 
@@ -1516,19 +1516,19 @@ def retrieve(
 
             +
 
-            0.10
+            0.12
             *
             min(claim_event_score, 1.0)
 
             +
 
-            0.04
+            0.06
             *
             min(number_score, 1.0)
 
             +
 
-            0.03
+            0.08
             *
             fact_score
         )

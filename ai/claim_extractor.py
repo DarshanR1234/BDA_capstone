@@ -47,6 +47,9 @@ Rules:
 9. Extract important numbers/dates separately.
 10. If there are multiple claims, identify the central claim and list
     the remaining important factual assertions as sub_claims.
+11. Language Consistency: Extract the main_claim, sub_claims, and entities in the
+    EXACT SAME language as the news article (if Hindi, extract in Hindi; if English, in English).
+    Do NOT translate.
 
 Return ONLY valid JSON.
 
@@ -64,26 +67,44 @@ JSON format:
 """
 
 
+import time
+
 def extract_claim(news_text: str) -> dict:
 
     if not news_text or not news_text.strip():
         raise ValueError("news_text cannot be empty.")
 
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT
-            },
-            {
-                "role": "user",
-                "content": news_text[:8000]
-            }
-        ],
-        temperature=0,
-        response_format={"type": "json_object"}
-    )
+    max_retries = 3
+    delay = 2.0
+    response = None
+
+    for attempt in range(max_retries + 1):
+        try:
+            response = client.chat.completions.create(
+                model=MODEL,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": SYSTEM_PROMPT
+                    },
+                    {
+                        "role": "user",
+                        "content": news_text[:8000]
+                    }
+                ],
+                temperature=0,
+                response_format={"type": "json_object"}
+            )
+            break
+        except Exception as exc:
+            err_str = str(exc).lower()
+            if ("429" in err_str or "rate limit" in err_str) and attempt < max_retries:
+                if "tokens per day" in err_str or "tpd" in err_str:
+                    raise exc
+                time.sleep(delay)
+                delay *= 2.0
+            else:
+                raise exc
 
     content = response.choices[0].message.content
 
@@ -112,9 +133,7 @@ def extract_claim(news_text: str) -> dict:
                 "numbers_dates"
             ] else ""
 
-    if not result["main_claim"]:
-        raise RuntimeError(
-            "Claim extraction failed: main_claim is empty."
-        )
+    if not result.get("main_claim") or not str(result["main_claim"]).strip():
+        result["main_claim"] = news_text.strip()
 
     return result

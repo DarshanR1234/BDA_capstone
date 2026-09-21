@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import time
 
 from dotenv import load_dotenv
 from groq import Groq
@@ -609,25 +610,40 @@ Return only valid JSON.
     # FIRST REQUEST
     # ========================================================
 
+    def _call_with_backoff(messages, max_retries=3, delay=2.0):
+        resp = None
+        for attempt in range(max_retries + 1):
+            try:
+                return client.chat.completions.create(
+                    model=MODEL_NAME,
+                    messages=messages,
+                    temperature=0,
+                    response_format={
+                        "type": "json_object"
+                    },
+                )
+            except Exception as exc:
+                err_str = str(exc).lower()
+                if ("429" in err_str or "rate limit" in err_str) and attempt < max_retries:
+                    if "tokens per day" in err_str or "tpd" in err_str:
+                        raise exc
+                    time.sleep(delay)
+                    delay *= 2.0
+                else:
+                    raise exc
+
     try:
 
-        response = client.chat.completions.create(
-            model=MODEL_NAME,
-            messages=[
-                {
-                    "role": "system",
-                    "content": SYSTEM_PROMPT,
-                },
-                {
-                    "role": "user",
-                    "content": user_prompt,
-                },
-            ],
-            temperature=0,
-            response_format={
-                "type": "json_object"
+        response = _call_with_backoff([
+            {
+                "role": "system",
+                "content": SYSTEM_PROMPT,
             },
-        )
+            {
+                "role": "user",
+                "content": user_prompt,
+            },
+        ])
 
         raw_content = (
             response.choices[0]
@@ -676,23 +692,16 @@ use UNCERTAIN.
 
         try:
 
-            response = client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": SYSTEM_PROMPT,
-                    },
-                    {
-                        "role": "user",
-                        "content": retry_prompt,
-                    },
-                ],
-                temperature=0,
-                response_format={
-                    "type": "json_object"
+            response = _call_with_backoff([
+                {
+                    "role": "system",
+                    "content": SYSTEM_PROMPT,
                 },
-            )
+                {
+                    "role": "user",
+                    "content": retry_prompt,
+                },
+            ])
 
             raw_content = (
                 response.choices[0]

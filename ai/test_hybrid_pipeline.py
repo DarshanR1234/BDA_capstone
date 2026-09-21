@@ -251,17 +251,17 @@ for article_id in TEST_IDS:
 
             print(
                 f"Entity Match: "
-                f"{item.get('entity_match_score', 0):.3f}"
+                f"{float(item.get('entity_match', item.get('entity_match_score', 0))):.3f}"
             )
 
             print(
                 f"Date/Number Match: "
-                f"{item.get('number_date_match_score', 0):.3f}"
+                f"{float(item.get('number_date_match', item.get('number_date_match_score', 0))):.3f}"
             )
 
             print(
                 f"Claim Match: "
-                f"{item.get('claim_match_score', 0):.3f}"
+                f"{float(item.get('claim_match', item.get('claim_match_score', item.get('phrase_match_score', 0)))):.3f}"
             )
 
             print(

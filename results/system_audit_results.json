@@ -1,0 +1,60 @@
+{
+  "test_1_dataset": {
+    "status": "PASS",
+    "rows": 67587,
+    "expected_rows": 67587,
+    "null_counts": {
+      "article_id": 0,
+      "url": 0,
+      "title": 0,
+      "content": 0,
+      "label": 0
+    },
+    "label_distribution": {
+      "1": 45845,
+      "0": 21742
+    },
+    "missing_rag_files": []
+  },
+  "test_2_api": {
+    "status": "PASS",
+    "latency_sec": 9.06,
+    "response": "{\"status\":\"ok\"}",
+    "key_prefix": "gsk_A6Wt..."
+  },
+  "test_3_claim_extractor": {
+    "status": "PASS",
+    "latency_sec": 0.91,
+    "extracted_claim": "The Ministry of Education announced at a press conference that all board examinations will be postponed to December 15 due to scheduling conflicts.",
+    "entities": [
+      "Ministry of Education",
+      "press conference"
+    ],
+    "numbers_dates": [
+      "December 15"
+    ],
+    "missing_keys": []
+  },
+  "test_4_retrieval_reranking": {
+    "status": "PASS",
+    "retrieval_latency_sec": 56.46,
+    "rerank_latency_sec": 0.01,
+    "candidate_count": 10,
+    "top_evidence_id": 34560,
+    "top_evidence_title": "वेस्टइंडीज के खिलाफ पाकिस्तान को पहले टेस्ट में मिली हार से नाखुश हैं मोहम्मद रिजवान",
+    "top_evidence_score": 0.3548,
+    "top_claim_match": 0.25,
+    "top_entity_match": 0.6667,
+    "top_strong_evidence": true
+  },
+  "test_5_pipeline": {
+    "status": "PASS",
+    "ground_truth": "FAKE",
+    "predicted_verdict": "UNCERTAIN",
+    "is_correct": false,
+    "confidence": 0.8,
+    "latency_sec": 38.16,
+    "evidence_count": 3,
+    "explanation": "None of the supplied evidence directly addresses the claim about Hindus being forced out of their homes and killed during a CAA protest in Murshidabad. Evidence 1 deals with a 2018 bus stone‑pelting incident unrelated to Murshidabad or any killings. "
+  }
+}
