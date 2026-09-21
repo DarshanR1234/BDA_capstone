@@ -1,0 +1,54 @@
+# ============================================================
+# FAKE NEWS BDA - .gitignore
+# ============================================================
+
+# ---- Python ----
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ---- Environment / Secrets ----
+.env
+.env.local
+.env.production
+
+# ---- Large Data Files ----
+data/raw/
+data/processed/
+
+# ---- RAG Index Files (3.7 GB+) ----
+results/rag/
+
+# ---- OS Files ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- IDE Files ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+
+# ---- Spark / Hadoop Temp ----
+spark-warehouse/
+metastore_db/
+derby.log
+
+# ---- Logs ----
+*.log
+
+# ---- Model Cache ----
+.cache/

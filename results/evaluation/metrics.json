@@ -1,0 +1,58 @@
+{
+    "dataset": "HinFakeNews-V1",
+    "dataset_label_mapping": {
+        "0": "FAKE",
+        "1": "REAL"
+    },
+    "total_dataset_rows": 67587,
+    "evaluation_sample_size": 10,
+    "sample_per_class": 5,
+    "fake_samples": 5,
+    "real_samples": 5,
+    "valid_predictions": 2,
+    "uncertain_count": 2,
+    "error_count": 6,
+    "correct_predictions": 1,
+    "accuracy_all_cases": 0.1,
+    "accuracy_valid_cases": 0.5,
+    "coverage_rate": 0.2,
+    "fake_precision": 0.5,
+    "fake_recall": 1.0,
+    "fake_f1": 0.6667,
+    "real_precision": 0.0,
+    "real_recall": 0.0,
+    "real_f1": 0.0,
+    "macro_f1": 0.3333,
+    "weighted_f1": 0.3333,
+    "uncertain_rate": 0.2,
+    "error_rate": 0.6,
+    "average_confidence": 0.8575,
+    "average_processing_time_seconds": 38.996,
+    "classification_report": {
+        "FAKE": {
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1-score": 0.6666666666666666,
+            "support": 1.0
+        },
+        "REAL": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 1.0
+        },
+        "accuracy": 0.5,
+        "macro avg": {
+            "precision": 0.25,
+            "recall": 0.5,
+            "f1-score": 0.3333333333333333,
+            "support": 2.0
+        },
+        "weighted avg": {
+            "precision": 0.25,
+            "recall": 0.5,
+            "f1-score": 0.3333333333333333,
+            "support": 2.0
+        }
+    }
+}
