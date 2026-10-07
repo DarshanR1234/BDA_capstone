@@ -276,15 +276,6 @@ Content-Type: application/json
 
 ---
 
-## 🎓 Academic Credentials
-
-- **Institution**: St. John College of Engineering & Management (SJCEM), Palghar
-- **Affiliation**: University of Mumbai (Autonomous Institute)
-- **Department**: Department of Artificial Intelligence and Machine Learning
-- **Subject**: Big Data Analytics (BDA) Capstone Project
-- **Academic Year**: 2024–2025
-
----
 
 ## 📄 License & Fair Use
 Developed for academic research and evaluation purposes. All fact-check citations are credited to original independent sources in the public dataset.
