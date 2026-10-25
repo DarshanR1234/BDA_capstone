@@ -12,10 +12,18 @@ if hasattr(sys.stderr, "reconfigure"):
 
 
 # ------------------------------------------------------------
-# Hadoop environment
+# Environment Setup (PySpark & Hadoop)
 # ------------------------------------------------------------
-os.environ["HADOOP_HOME"] = r"C:\hadoop\hadoop-3.3.6"
-os.environ["HADOOP_CONF_DIR"] = r"C:\hadoop\hadoop-3.3.6\etc\hadoop"
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PYSPARK_PATH = PROJECT_ROOT / ".venv" / "Lib" / "site-packages" / "pyspark"
+if PYSPARK_PATH.exists():
+    os.environ["SPARK_HOME"] = str(PYSPARK_PATH)
+
+# Remove invalid hardcoded Hadoop paths to allow Spark local mode without WinError 2
+os.environ.pop("HADOOP_HOME", None)
+os.environ.pop("HADOOP_CONF_DIR", None)
 
 
 # ------------------------------------------------------------
@@ -51,7 +59,7 @@ spark = (
     .appName("FakeNewsBDA-Analytics")
     .master("local[*]")
     .config("spark.driver.memory", "2g")
-    .config("spark.sql.shuffle.partitions", "8")
+    .config("spark.sql.shuffle.partitions", "4")
     .getOrCreate()
 )
 
@@ -62,8 +70,8 @@ spark.sparkContext.setLogLevel("WARN")
 # Paths
 # ------------------------------------------------------------
 HDFS_INPUT = "hdfs://localhost:9000/fake-news-bda/processed/news_cleaned.csv"
-
-RESULTS_PATH = "D:/fake-news-bda/results/spark"
+LOCAL_INPUT = str(PROJECT_ROOT / "data" / "processed" / "news_cleaned.csv")
+RESULTS_PATH = str(PROJECT_ROOT / "results" / "spark")
 
 
 # ------------------------------------------------------------
@@ -79,27 +87,40 @@ schema = StructType([
 
 
 # ------------------------------------------------------------
-# Read CSV from HDFS
-#
-# IMPORTANT:
-# These are the options used by the successful
-# test_hdfs_csv.py run.
+# Read CSV from HDFS (with automatic fallback to local Big Data storage)
 # ------------------------------------------------------------
-print("\n[1] Reading dataset from HDFS...")
+print("\n[1] Reading dataset into Spark DataFrame...")
 print("-" * 70)
 
-df = (
-    spark.read
-    .option("header", "true")
-    .option("multiLine", "true")
-    .option("quote", '"')
-    .option("escape", '"')
-    .option("encoding", "UTF-8")
-    .schema(schema)
-    .csv(HDFS_INPUT)
-)
-
-print("Dataset successfully loaded from HDFS.")
+try:
+    print(f"Attempting to read from HDFS: {HDFS_INPUT}")
+    df = (
+        spark.read
+        .option("header", "true")
+        .option("multiLine", "true")
+        .option("quote", '"')
+        .option("escape", '"')
+        .option("encoding", "UTF-8")
+        .schema(schema)
+        .csv(HDFS_INPUT)
+    )
+    # Trigger action to test connection
+    df.take(1)
+    print("Dataset successfully loaded from HDFS.")
+except Exception as hdfs_err:
+    print(f"[Notice] HDFS cluster not reachable ({hdfs_err}).")
+    print(f"Reading from local Big Data storage: {LOCAL_INPUT}")
+    df = (
+        spark.read
+        .option("header", "true")
+        .option("multiLine", "true")
+        .option("quote", '"')
+        .option("escape", '"')
+        .option("encoding", "UTF-8")
+        .schema(schema)
+        .csv(LOCAL_INPUT)
+    )
+    print("Dataset successfully loaded from Big Data storage.")
 
 
 # ------------------------------------------------------------
